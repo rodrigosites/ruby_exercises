@@ -1,16 +1,15 @@
 def bubble_sort(array)
-  begin
+  loop do
     sorted = false
     array.each_index do |i|
-      unless array[i+1].nil? 
-        if array[i] > array[i+1]
-          array[i], array[i+1] = array[i+1], array[i]
-          sorted = true
-        end
+      if !array[i + 1].nil? && array[i] > array[i + 1]
+        array[i], array[i + 1] = array[i + 1], array[i]
+        sorted = true
       end
     end
-  end while sorted
+    break unless sorted
+  end
   array
 end
 
-p bubble_sort([4,3,78,2,0,2])
+p bubble_sort([4, 3, 78, 2, 0, 2])
