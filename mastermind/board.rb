@@ -1,7 +1,10 @@
+# frozen_string_literal: true
+
 require 'pry'
 
+# Board
 class Board
-  COLORS = ['blue', 'black', 'green', 'red', 'yellow', 'white']
+  COLORS = %w[blue black green red yellow white].freeze
   TURNS = 12
   COLUMNS = 4
 
@@ -10,7 +13,10 @@ class Board
     @feedback_board = []
     @correct_code = []
     COLUMNS.times { @correct_code.push(COLORS[rand(0..5)]) }
-    TURNS.times { @guess_board.push(['.', '.', '.', '.']) }
+    TURNS.times do
+      @guess_board.push(%w[. . . .])
+      @feedback_board.push(%w[_ _ _ _])
+    end
   end
 
   def mark_row(row_line, guess)
@@ -18,8 +24,11 @@ class Board
   end
 
   def show_board
-    @guess_board.each do |row|
-      puts "| #{row[0]} #{row[1]} #{row[2]} #{row[3]} | "
+    @guess_board.each_with_index do |row, index|
+      puts "#{format('%02d', index + 1)} - | #{row[0]} #{row[1]} #{row[2]} #{row[3]} | #{@feedback_board[index][0]}#{@feedback_board[index][1]}#{@feedback_board[index][2]}#{@feedback_board[index][3]} "
     end
   end
 end
+
+board = Board.new
+board.show_board
