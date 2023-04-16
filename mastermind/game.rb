@@ -1,5 +1,9 @@
+# frozen_string_literal: true
+
 # Game
 class Game
+  attr_reader :round
+
   def initialize
     @round = 1
   end

@@ -1,12 +1,15 @@
+# frozen_string_literal: true
+
 # Player
 class Player
-	def initialize
-		@input = []
-	end
-	
-	def input
-		input = gets.chomp.split
-		input.each do |word|
-			@input.p
-	end
+  attr_reader :guess
+
+  def initialize
+    @guess = []
+  end
+
+  def ask_guess
+    puts 'Type your guess:'
+    @guess = gets.chomp.split
+  end
 end
