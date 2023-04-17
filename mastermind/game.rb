@@ -10,6 +10,8 @@ class Game
 
   def start
     puts 'MASTERMIND'
+    puts 'Do you wish to be the code creator or the guesser?'
+    puts 'Type 1 for code creator or 2 for guesser:'
   end
 
   def show_round

@@ -8,13 +8,13 @@ class Board
 
   attr_reader :guess_board, :win_condition, :correct_code, :feedback_board, :feedback_check
 
-  def initialize
+  def initialize(code = 0)
     @guess_board = []
     @feedback_board = []
     @correct_code = []
     @feedback_check = []
     @win_condition = false
-    COLUMNS.times { @correct_code.push(COLORS[rand(0..5)]) }
+    COLUMNS.times { @correct_code.push(COLORS[rand(0..5)]) } if code.zero?
     TURNS.times do
       @guess_board.push(%w[. . . .])
       @feedback_board.push(%w[_ _ _ _])
