@@ -6,12 +6,13 @@ class Board
   TURNS = 12
   COLUMNS = 4
 
-  attr_reader :guess_board, :win_condition
+  attr_reader :guess_board, :win_condition, :correct_code, :feedback_board, :feedback_check
 
   def initialize
     @guess_board = []
     @feedback_board = []
     @correct_code = []
+    @feedback_check = []
     @win_condition = false
     COLUMNS.times { @correct_code.push(COLORS[rand(0..5)]) }
     TURNS.times do
@@ -24,20 +25,38 @@ class Board
     guesses.each_with_index { |guess, index| @guess_board[row_line - 1][index] = guess }
   end
 
-  def mark_feedback(round)
-    if guess_board[round] == @correct_code
-      @feedback_board[round] = %w[X X X X]
-      @win_condition = true
-    else
-      feedback_exact = []
-      feedback_partial = []
-      @guess_board[round].each_with_index do |guess, index|
-        if guess == @correct_code[index]
-          @feedback_board[round][feedback_exact] = 'X'
-          feedback_exact.push(index)
+  def check_win_condition(round)
+    return unless guess_board[round] == @correct_code
 
-      
+    @feedback_board[round] = %w[X X X X]
+    @win_condition = true
+  end
+
+  def check_correct_marks(round)
+    feedback_count = 0
+    @feedback_check = []
+    @guess_board[round].each_with_index do |guess, index|
+      if guess == @correct_code[index]
+        @feedback_board[round][feedback_count] = 'X'
+        feedback_count += 1
+      else
+        @feedback_check.push(index)
+      end
     end
+  end
+
+  def check_partial_marks(round)
+    feedback_count = @feedback_check.length
+    @feedback_check.each do |index|
+      if @correct_code.values_at(*@feedback_check).include?(@guess_board[round][index])
+        @feedback_board[round][feedback_count] = 'x'
+        feedback_count += 1
+      end
+    end
+  end
+
+  def clear_feedback_check
+    @feedback_check.clear
   end
 
   def show_board
