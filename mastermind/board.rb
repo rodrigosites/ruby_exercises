@@ -46,7 +46,7 @@ class Board
   end
 
   def check_partial_marks(round)
-    feedback_count = @feedback_check.length
+    feedback_count = COLUMNS - @feedback_check.length
     @feedback_check.each do |index|
       if @correct_code.values_at(*@feedback_check).include?(@guess_board[round][index])
         @feedback_board[round][feedback_count] = 'x'
