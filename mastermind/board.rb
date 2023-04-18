@@ -1,20 +1,19 @@
 # frozen_string_literal: true
 
+require_relative 'settings'
+
 # Board
 class Board
-  COLORS = %w[blue black green red yellow white].freeze
-  TURNS = 12
-  COLUMNS = 4
-
+  include Settings
   attr_reader :guess_board, :win_condition, :correct_code, :feedback_board, :feedback_check
 
-  def initialize(code = 0)
+  def initialize(code = [])
     @guess_board = []
     @feedback_board = []
-    @correct_code = []
     @feedback_check = []
     @win_condition = false
-    COLUMNS.times { @correct_code.push(COLORS[rand(0..5)]) } if code.zero?
+    @correct_code = code
+    COLUMNS.times { @correct_code.push(COLORS[rand(0..5)]) } if @correct_code.empty?
     TURNS.times do
       @guess_board.push(%w[. . . .])
       @feedback_board.push(%w[_ _ _ _])

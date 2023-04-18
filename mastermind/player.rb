@@ -1,7 +1,10 @@
 # frozen_string_literal: true
 
+require_relative 'settings'
+
 # Player
 class Player
+  include Settings
   attr_reader :guess, :function, :code
 
   def initialize(player_type)
@@ -26,6 +29,7 @@ class Player
   end
 
   def generate_guess
+    @guess.clear if @guess.length.positive?
     COLUMNS.times { @guess.push(COLORS[rand(0..5)]) }
   end
 end
