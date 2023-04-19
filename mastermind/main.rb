@@ -9,7 +9,7 @@ game = Game.new
 player = Player.new('player')
 game.start
 player.ask_function
-if player.function == '1'
+if player.function == 'codemaker'
   player.ask_code
   computer = Player.new('computer')
   board = Board.new(player.code)
@@ -18,8 +18,9 @@ else
 end
 until board.win_condition
   game.show_round
-  if player.function == '1'
-    computer.generate_guess
+  if player.function == 'codemaker'
+    binding.pry
+    game.round > 1 ? computer.generate_guess(board.feedback_board[game.round - 2]) : computer.generate_guess
     board.mark_guess(game.round, computer.guess)
   else
     player.ask_guess
