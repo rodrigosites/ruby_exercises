@@ -12,7 +12,7 @@ class Player
     @function = nil
     @code = nil
     @type = player_type
-    @ai_guesses = [] if @type == 'computer'
+    @ai_guesses = COLORS.repeated_permutation(4).to_a if @type == 'computer'
   end
 
   def ask_guess
@@ -30,13 +30,19 @@ class Player
   end
 
   def generate_guess(last_feedback = [])
-    @ai_guess = COLORS.repeated_permutation(4).to_a if @ai_guesses.empty?
     @guess = %w[black black blue blue] if @guess.empty?
-    unless last_feedback.empty?
-      if (last_feedback.count('X') + last_feedback.count('x')).zero?
-        @ai_guess = @ai_guess.difference(@guess.uniq.repeated_permutation(4).to_a)
-        @guess = @ai_guess.first
-      end
+    return if last_feedback.empty?
+
+    @ai_guesses = @ai_guesses.difference(@guess.uniq.repeated_permutation(4).to_a)
+    if (last_feedback.count('X') + last_feedback.count('x')).zero?
+      possible_guesses = COLORS.difference(@guess.uniq).repeated_permutation(4).to_a
+      @ai_guesses = @ai_guesses.intersection(possible_guesses)
+    elsif last_feedback == %w[x _ _ _]
+      possible_guesses = []
+      @guess.uniq.each { |color| possible_guesses += COLORS.difference([color]).permutation(4).to_a }
+      possible_guesses.uniq!
+      @ai_guesses = @ai_guesses.intersection(possible_guesses)
     end
+    @guess = @ai_guesses.first
   end
 end

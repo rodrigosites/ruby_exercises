@@ -20,8 +20,8 @@ class Board
     end
   end
 
-  def mark_guess(row_line, guesses)
-    guesses.each_with_index { |guess, index| @guess_board[row_line - 1][index] = guess }
+  def mark_guess(row_line, colors)
+    colors.each_with_index { |guess, index| @guess_board[row_line][index] = guess }
   end
 
   def check_win_condition(round)
@@ -46,11 +46,13 @@ class Board
 
   def check_partial_marks(round)
     feedback_count = COLUMNS - @feedback_check.length
+    correct_aux = @correct_code.slice(0..-1)
     @feedback_check.each do |index|
-      if @correct_code.values_at(*@feedback_check).include?(@guess_board[round][index])
-        @feedback_board[round][feedback_count] = 'x'
-        feedback_count += 1
-      end
+      next unless correct_aux.values_at(*@feedback_check).include?(@guess_board[round][index])
+
+      @feedback_board[round][feedback_count] = 'x'
+      correct_aux.delete_at(correct_aux.index(@guess_board[round][index]))
+      feedback_count += 1
     end
   end
 
