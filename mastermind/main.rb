@@ -1,9 +1,12 @@
 # frozen_string_literal: true
 
+
 require 'pry'
 require_relative 'board'
 require_relative 'game'
 require_relative 'player'
+require_relative 'settings'
+include Settings
 
 game = Game.new
 player = Player.new('player')
@@ -18,7 +21,6 @@ else
 end
 until board.win_condition
   game.show_round
-  p board.correct_code
   if player.function == 'codemaker'
     game.round > 1 ? computer.generate_guess(board.feedback_board[game.round - 2]) : computer.generate_guess
     board.mark_guess(game.round - 1, computer.guess)
@@ -32,6 +34,13 @@ until board.win_condition
   board.show_board
   board.clear_feedback_check
   game.next_round
-  break if game.round > 12
+  break if game.round > TURNS
 end
-puts 'You win!'
+if board.win_condition && player.function == 'codebreaker'
+  puts 'You win!'
+elsif !board.win_condition && player.function == 'codemaker'
+  puts 'You win!'
+else
+  puts 'You lose!'
+  puts "The correct code was #{board.correct_code}"
+end

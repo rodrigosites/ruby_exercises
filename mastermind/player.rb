@@ -12,7 +12,7 @@ class Player
     @function = nil
     @code = nil
     @type = player_type
-    @ai_guesses = COLORS.repeated_permutation(4).to_a if @type == 'computer'
+    @possible_combinations = COLORS.repeated_permutation(COLUMNS).to_a if @type == 'computer'
   end
 
   def ask_guess
@@ -30,19 +30,31 @@ class Player
   end
 
   def generate_guess(last_feedback = [])
-    @guess = %w[black black blue blue] if @guess.empty?
+    @guess = [COLORS.sample, COLORS.sample, COLORS.sample, COLORS.sample] if @guess.empty?
     return if last_feedback.empty?
 
-    @ai_guesses = @ai_guesses.difference(@guess.uniq.repeated_permutation(4).to_a)
-    if (last_feedback.count('X') + last_feedback.count('x')).zero?
-      possible_guesses = COLORS.difference(@guess.uniq).repeated_permutation(4).to_a
-      @ai_guesses = @ai_guesses.intersection(possible_guesses)
-    elsif last_feedback == %w[x _ _ _]
-      possible_guesses = []
-      @guess.uniq.each { |color| possible_guesses += COLORS.difference([color]).permutation(4).to_a }
-      possible_guesses.uniq!
-      @ai_guesses = @ai_guesses.intersection(possible_guesses)
+    result = { correct_positions: last_feedback.count('X'), correct_colors: last_feedback.count('x') }
+    if (result[:correct_positions] + result[:correct_colors]).zero?
+      @possible_combinations = COLORS.difference(@guess.uniq).repeated_permutation(COLUMNS).to_a
+    else
+      @possible_combinations.select! do |combination|
+        comparing_result = verify_combination(combination)
+        result == comparing_result || comparing_result[:correct_positions] + comparing_result[:correct_colors] > result[:correct_positions] + result[:correct_colors]
+      end
     end
-    @guess = @ai_guesses.first
+    @guess = @possible_combinations.sample
+  end
+
+  def verify_combination(combination)
+    correct_positions = 0
+    correct_colors = 0
+    @guess.each_with_index do |color, index|
+      if color == combination[index]
+        correct_positions += 1
+      elsif combination.include?(color)
+        correct_colors += 1
+      end
+    end
+    { correct_positions: correct_positions, correct_colors: correct_colors }
   end
 end
