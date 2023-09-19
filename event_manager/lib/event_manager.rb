@@ -23,6 +23,9 @@ def find_registration_peak_hours(registration_hours)
   registration_hours.each_pair do |key, value|
     puts "#{key}:00 - #{value} registers."
   end
+  registration_hours.filter do |key, value|
+    puts "Peak hour at #{key}:00 with #{value} registrations." if value == registration_hours.values.max
+  end
 end
 
 def save_registration_hour(registration_date, registration_hours)
@@ -39,6 +42,9 @@ def find_registration_peak_days(registration_days)
   puts 'Showing register days by quantity:'
   registration_days.each_pair do |key, value|
     puts "#{Date::DAYNAMES[key]} - #{value} registers."
+  end
+  registration_days.filter do |key, value|
+    puts "Peak day at #{Date::DAYNAMES[key]} with #{value} registrations." if value == registration_days.values.max
   end
 end
 
