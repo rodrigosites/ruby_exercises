@@ -7,6 +7,7 @@ def clean_zipcode(zipcode)
 end
 
 def clean_phone_number(phone_number)
+  phone_number.delete!('-() .')
   phone_number_length = phone_number.to_s.length
   if phone_number_length == 11 && phone_number.to_s[0] == "1"
     phone_number.to_s[1..10]
@@ -15,6 +16,40 @@ def clean_phone_number(phone_number)
   else
     'bad number'
   end
+end
+
+def find_registration_peak_hours(registration_hours)
+  puts 'Showing register hours by quantity:'
+  registration_hours.each_pair do |key, value|
+    puts "#{key}:00 - #{value} registers."
+  end
+end
+
+def save_registration_hour(registration_date, registration_hours)
+  registration_hour = DateTime.strptime(registration_date, '%m/%d/%Y %H:%M').hour
+  if registration_hours.include?(registration_hour)
+    registration_hours[registration_hour] += 1
+  else
+    registration_hours[registration_hour] = 1
+  end
+  registration_hours
+end
+
+def find_registration_peak_days(registration_days)
+  puts 'Showing register days by quantity:'
+  registration_days.each_pair do |key, value|
+    puts "#{Date::DAYNAMES[key]} - #{value} registers."
+  end
+end
+
+def save_registration_day(registration_date, registration_days)
+  registration_day = DateTime.strptime(registration_date, '%m/%d/%Y %H:%M').wday
+  if registration_days.include?(registration_day)
+    registration_days[registration_day] += 1
+  else
+    registration_days[registration_day] = 1
+  end
+  registration_days
 end
 
 def legislators_by_zipcode(zipcode)
@@ -49,13 +84,26 @@ end
 template_letter = File.read('./form_letter.erb')
 erb_template = ERB.new template_letter
 
+registration_hours = {}
+registration_days = {}
+
 contents.each do |row|
   id = row[0]
   name = row[:first_name]
   zipcode = clean_zipcode(row[:zipcode])
   phone_number = clean_phone_number(row[:homephone])
+  registration_date = row[:regdate]
+  registration_hours = save_registration_hour(registration_date, registration_hours)
+  registration_days = save_registration_day(registration_date, registration_days)
+
   legislators = legislators_by_zipcode(zipcode)
 
   form_letter = erb_template.result(binding)
   save_thank_you_letter(id, form_letter)
+
+  puts "Saving letter for #{id} - #{name}"
+  puts "Phone number is a #{phone_number}" if phone_number.eql?('bad number')
 end
+
+find_registration_peak_hours(registration_hours)
+find_registration_peak_days(registration_days)
