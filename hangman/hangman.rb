@@ -2,28 +2,23 @@
 
 gibbet = [' ____ ',
           '|    |',
-          '|',
-          '|',
-          '|',
-          '|',
+          "|\n|\n|\n|",
           '|',
           '|_____',
           '|     |',
           '|_____|']
 
-hangman = ['|',
-           '|    O',
-           '|    |',
-           '|   /|',
-           '|   /|\\',
-           '|    |',
-           '|   / ',
-           '|   / \\']
+hangman = ["|    O\n|\n|\n|",
+           "|    O\n|    |\n|\n|",
+           "|    O\n|   /|\n|\n|",
+           "|    O\n|   /|\\\n|\n|",
+           "|    O\n|   /|\\\n|    |\n|",
+           "|    O\n|   /|\\\n|    |\n|   / ",
+           "|    O\n|   /|\\\n|    |\n|   / \\"]
 
 def draw_hangman(gibbet, hangman, errors, round)
   puts "\n------------- HANGMAN - ROUND #{round} -------------"
-  for i in 0..errors do
-    gibbet[errors + 2] = hangman[errors]
+  gibbet[2] = hangman[errors - 1] if errors.positive?
   gibbet.each { |line| puts line }
 end
 
@@ -99,5 +94,8 @@ end
 if win_condition?(secret_word, correct_letters)
   puts 'You win!'
 else
+  draw_hangman(gibbet, hangman, wrong_letters.length, round)
+  draw_correct_letters(correct_letters)
+  draw_wrong_letters(wrong_letters)
   puts 'You lose!'
 end
