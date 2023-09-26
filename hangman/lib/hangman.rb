@@ -6,10 +6,9 @@ require_relative 'game'
 game = Game.new
 
 if game.start == '2'
-  saved = File.open('savedgames/test.json')
-  loaded_game = JSON.parse(saved.read)
-  saved.close
-  game = loaded_game
+  File.open('savedgames/test.json', 'r') do |file|
+    game = Game.from_json(file.read)
+  end
 end
 
 until game.over?
@@ -21,9 +20,9 @@ until game.over?
     game.save_correct_guess(player_guess)
     game.draw_correct_letters
   else
-    game.save_wrong_letter(player_guess)
+    game.wrong_letters << player_guess
     game.draw_wrong_letters
   end
-  dump = JSON.dump(game)
-  File.open('savedgames/test.json', 'w') { |file| file.write dump }
+  game.round += 1
+  File.open('savedgames/test.json', 'w') { |file| file.write(game.to_json) }
 end

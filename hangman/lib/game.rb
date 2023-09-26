@@ -1,28 +1,45 @@
 # frozen_string_literal: true
 
+HANGMAN = ["|    O\n|\n|\n|",
+           "|    O\n|    |\n|\n|",
+           "|    O\n|   /|\n|\n|",
+           "|    O\n|   /|\\\n|\n|",
+           "|    O\n|   /|\\\n|    |\n|",
+           "|    O\n|   /|\\\n|    |\n|   / ",
+           "|    O\n|   /|\\\n|    |\n|   / \\"].freeze
+
+GIBBET = [' ____ ',
+          '|    |',
+          "|\n|\n|\n|",
+          '|',
+          '|_____',
+          '|     |',
+          '|_____|']
+
 # Game class
 class Game
-  attr_reader :wrong_letters
+  attr_accessor :wrong_letters, :round
 
-  def initialize
-    @gibbet = [' ____ ',
-               '|    |',
-               "|\n|\n|\n|",
-               '|',
-               '|_____',
-               '|     |',
-               '|_____|']
-    @hangman = ["|    O\n|\n|\n|",
-                "|    O\n|    |\n|\n|",
-                "|    O\n|   /|\n|\n|",
-                "|    O\n|   /|\\\n|\n|",
-                "|    O\n|   /|\\\n|    |\n|",
-                "|    O\n|   /|\\\n|    |\n|   / ",
-                "|    O\n|   /|\\\n|    |\n|   / \\"]
-    @secret_word = fetch_word_from_dictionary
-    @correct_letters = String.new.rjust(@secret_word.length, '_')
-    @wrong_letters = []
-    @round = 0
+  def initialize(args = {})
+    @gibbet = GIBBET
+    @secret_word = args['secret_word'].nil? ? fetch_word_from_dictionary : args['secret_word']
+    @correct_letters = args['correct_letters'].nil? ? String.new.rjust(@secret_word.length, '_') : args['correct_letters']
+    @wrong_letters = args['wrong_letters'].nil? ? [] : args['wrong_letters']
+    @round = args['round'].nil? ? 0 : args['round']
+  end
+
+  def to_json
+    {
+      secret_word: @secret_word,
+      correct_letters: @correct_letters,
+      wrong_letters: @wrong_letters,
+      round: @round
+    }.to_json
+  end
+
+  def self.from_json(json_str)
+    data = JSON.parse(json_str)
+    new(data)
   end
 
   def start
@@ -40,7 +57,7 @@ class Game
 
   def draw_hangman(errors)
     puts "\n------------- HANGMAN - ROUND #{@round} -------------"
-    @gibbet[2] = @hangman[errors - 1] if errors.positive?
+    @gibbet[2] = HANGMAN[errors - 1] if errors.positive?
     @gibbet.each { |line| puts line }
   end
 
@@ -82,12 +99,6 @@ class Game
       current_index = @secret_word.index(player_guess, current_index + 1)
       @correct_letters[current_index] = player_guess unless current_index.nil?
     end
-    @round += 1
-  end
-
-  def save_wrong_letter(player_guess)
-    @wrong_letters << player_guess
-    @round += 1
   end
 
   def over?
