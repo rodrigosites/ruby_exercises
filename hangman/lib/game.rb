@@ -22,10 +22,10 @@ class Game
 
   def initialize(args = {})
     @gibbet = GIBBET
-    @secret_word = args['secret_word'].nil? ? fetch_word_from_dictionary : args['secret_word']
-    @correct_letters = args['correct_letters'].nil? ? String.new.rjust(@secret_word.length, '_') : args['correct_letters']
-    @wrong_letters = args['wrong_letters'].nil? ? [] : args['wrong_letters']
-    @round = args['round'].nil? ? 0 : args['round']
+    @secret_word = args[:secret_word].nil? ? fetch_word_from_dictionary : args[:secret_word]
+    @correct_letters = args[:correct_letters].nil? ? String.new.rjust(@secret_word.length, '_') : args[:correct_letters]
+    @wrong_letters = args[:wrong_letters].nil? ? [] : args[:wrong_letters]
+    @round = args[:round].nil? ? 0 : args[:round]
   end
 
   def to_json
@@ -38,7 +38,7 @@ class Game
   end
 
   def self.from_json(json_str)
-    data = JSON.parse(json_str)
+    data = JSON.parse(json_str, { symbolize_names: true })
     new(data)
   end
 
@@ -77,6 +77,7 @@ class Game
     begin
       print "\nType your guess letter: "
       guess = gets.chomp.downcase
+      return guess if guess == 'save'
       raise "Invalid guess #{guess}." unless /[[:alpha:]]/.match(guess) && guess.length == 1
       raise "You've already guessed that letter!" if @correct_letters.include?(guess) ||
                                                      @wrong_letters.include?(guess)
@@ -109,7 +110,7 @@ class Game
       draw_hangman(@wrong_letters.length)
       draw_correct_letters
       draw_wrong_letters
-      puts 'You lose!'
+      puts "You lose! The secret word was #{@secret_word}."
       true
     end
   end
@@ -118,8 +119,6 @@ class Game
     if File.exist?('google-10000-english-no-swears.txt')
       dictionary = File.read('google-10000-english-no-swears.txt').split
     end
-    secret_word = dictionary.select { |word| word.length >= 5 && word.length <= 12 }.sample
-    puts "Secret word is #{secret_word}"
-    secret_word
+    dictionary.select { |word| word.length >= 5 && word.length <= 12 }.sample
   end
 end
