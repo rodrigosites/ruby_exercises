@@ -22,10 +22,17 @@ class Game
 
   def initialize(args = {})
     @gibbet = GIBBET
-    @secret_word = args[:secret_word].nil? ? fetch_word_from_dictionary : args[:secret_word]
-    @correct_letters = args[:correct_letters].nil? ? String.new.rjust(@secret_word.length, '_') : args[:correct_letters]
-    @wrong_letters = args[:wrong_letters].nil? ? [] : args[:wrong_letters]
-    @round = args[:round].nil? ? 0 : args[:round]
+    if args.empty?
+      @secret_word = fetch_word_from_dictionary
+      @correct_letters = String.new.rjust(@secret_word.length, '_')
+      @wrong_letters = []
+      @round = 0
+    else
+      @secret_word = args[:secret_word]
+      @correct_letters = args[:correct_letters]
+      @wrong_letters = args[:wrong_letters]
+      @round = args[:round]
+    end
   end
 
   def to_json
